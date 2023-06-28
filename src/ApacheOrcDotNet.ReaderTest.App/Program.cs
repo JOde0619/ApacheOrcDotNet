@@ -17,7 +17,7 @@ namespace ApacheOrcDotNet.ReaderTest.App
             }
 
             //var filename = args[0];
-            var filename = @"C:\Users\ChrisBrook\Downloads\ctp-to-s3-3-2023-06-27-17-04-23-13d04958-9372-4f37-b225-f58f682886ba.orc";
+            var filename = @"..\..\..\..\..\test\SampleFiles\ctp-to-s3-3-2023-06-27-17-04-23-13d04958-9372-4f37-b225-f58f682886ba.orc";
             var stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
             var fileTail = new FileTail(stream);
 
