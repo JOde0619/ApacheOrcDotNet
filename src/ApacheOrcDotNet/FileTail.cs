@@ -6,6 +6,7 @@ using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -47,10 +48,35 @@ namespace ApacheOrcDotNet
 		Protocol.Footer ReadFooter(Protocol.PostScript postScript, byte postScriptLength)
 		{
 			_inputStream.Seek(-1 - postScriptLength - (long)postScript.FooterLength, SeekOrigin.End);
-			var compressedStream = new StreamSegment(_inputStream, (long)postScript.FooterLength, true);
-			var footerStream = OrcCompressedStream.GetDecompressingStream(compressedStream, postScript.Compression);
 
-			return Serializer.Deserialize<Protocol.Footer>(footerStream);
+            //byte[] footerBytes = new byte[postScript.FooterLength];
+            //int bytesRead = _inputStream.Read(footerBytes, 0, footerBytes.Length);
+            //if (bytesRead != (long)postScript.FooterLength) throw new Exception("Incorrect number of footer bytes read from stream");
+
+            //var b = Snappier.Snappy.DecompressToArray(footerBytes);
+            //var c = IronSnappy.Snappy.Decode(new ReadOnlySpan<byte>(footerBytes));
+
+            //using var memStream = new MemoryStream(footerBytes);
+
+
+            ////var foo2 = Serializer.Deserialize<Protocol.Footer>(memStream);
+            
+            
+            //using var decompressedStream = new Snappier.SnappyStream(memStream, CompressionMode.Decompress);
+            //var memStream2 = new MemoryStream(new byte[1024*10]);
+            //decompressedStream.CopyTo(memStream2);
+            //var bytes = memStream2.ToArray();
+
+            //var foo = Serializer.Deserialize<Protocol.Footer>(decompressedStream);
+
+            var compressedStream = new StreamSegment(_inputStream, (long)postScript.FooterLength, true);
+
+            var ironSnappyStream = IronSnappy.Snappy.OpenReader(compressedStream);
+            var c = Serializer.Deserialize<Protocol.Footer>(ironSnappyStream);
+
+            var footerStream = OrcCompressedStream.GetDecompressingStream(compressedStream, postScript.Compression);
+            
+            return Serializer.Deserialize<Protocol.Footer>(footerStream);
 		}
     }
 }

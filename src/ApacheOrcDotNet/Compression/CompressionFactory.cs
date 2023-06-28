@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using IronSnappy;
 
 namespace ApacheOrcDotNet.Compression
 {
@@ -35,10 +37,11 @@ namespace ApacheOrcDotNet.Compression
 		/// <param name="inputStream">Stream to read compressed data from</param>
 		/// <returns>Readable decompressing stream</returns>
 		public static IOStream CreateDecompressorStream(CompressionKind compressionType, IOStream inputStream)
-		{
+        {
 			switch (compressionType)
 			{
 				case CompressionKind.Zlib: return new ZLibStream(inputStream);
+                case CompressionKind.Snappy: return new Snappier.SnappyStream(inputStream, CompressionMode.Decompress);
 				default:
 					throw new NotImplementedException($"Unimplemented {nameof(CompressionType)} {compressionType}");
 			}
